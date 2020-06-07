@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           SnackBar(
                             content: Text(
                                 'Hold a story title to save it for later!'),
-                            duration: Duration(seconds: 3),
+                            duration: Duration(seconds: 2),
                           ),
                         )
                       }
@@ -108,6 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   StretchMode.blurBackground,
                   StretchMode.fadeTitle,
                 ],
+                centerTitle: true,
                 title:
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Icon(Icons.train),

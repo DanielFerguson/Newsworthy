@@ -8,25 +8,23 @@ class Article extends StatelessWidget {
 
   RegExp exp = new RegExp(r"<[^>]*>");
 
-  static const routeName = '/article';
-
   final String title;
   final String author;
   final String description;
   final String link;
   final String linkToImage;
 
-  // _launchURL(url) async {
-  //   if (await canLaunch(url)) {
-  //     await launch(
-  //       url,
-  //       forceSafariVC: true,
-  //       forceWebView: true,
-  //     );
-  //   } else {
-  //     throw 'Could not launch $url';
-  //   }
-  // }
+  _launchURL(url) async {
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceSafariVC: true,
+        forceWebView: true,
+      );
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +44,7 @@ class Article extends StatelessWidget {
                 StretchMode.blurBackground,
                 StretchMode.fadeTitle,
               ],
+              centerTitle: true,
               background: Image.network(
                 linkToImage,
                 fit: BoxFit.cover,
@@ -84,7 +83,7 @@ class Article extends StatelessWidget {
                   ),
                 ),
                 FlatButton(
-                  onPressed: () => {print("Pressed")},
+                  onPressed: () => _launchURL(link),
                   child: Text("Show Article"),
                 )
               ],

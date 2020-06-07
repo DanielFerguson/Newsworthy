@@ -5,7 +5,6 @@ import 'article.dart';
 class Favourited extends StatefulWidget {
   Favourited({Key key, this.favourites}) : super(key: key);
 
-  static const routeName = '/favourited';
   final List<dynamic> favourites;
 
   @override
@@ -31,6 +30,7 @@ class _Favourited extends State<Favourited> {
                 StretchMode.blurBackground,
                 StretchMode.fadeTitle,
               ],
+              centerTitle: true,
               title:
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Icon(Icons.favorite),
