@@ -3,71 +3,94 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Article extends StatelessWidget {
-  Article(this.title, this.author, this.description, this.link);
+  Article(
+      this.title, this.author, this.description, this.link, this.linkToImage);
 
   RegExp exp = new RegExp(r"<[^>]*>");
 
-  final String title;
-  final String description;
-  final String author;
-  final String link;
+  static const routeName = '/article';
 
-  _launchURL(url) async {
-    if (await canLaunch(url)) {
-      await launch(
-        url,
-        forceSafariVC: true,
-        forceWebView: true,
-      );
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+  final String title;
+  final String author;
+  final String description;
+  final String link;
+  final String linkToImage;
+
+  // _launchURL(url) async {
+  //   if (await canLaunch(url)) {
+  //     await launch(
+  //       url,
+  //       forceSafariVC: true,
+  //       forceWebView: true,
+  //     );
+  //   } else {
+  //     throw 'Could not launch $url';
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: Container(),
-        title: Text("Article"),
-      ),
-      backgroundColor: black,
-      body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints viewportConstraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: viewportConstraints.maxHeight,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 96),
-              child: Column(
-                children: [
-                  Text(
-                    title ?? "Whoops!",
-                    style: TextStyle(
-                      fontSize: 22,
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  Text(author ?? ""),
-                  Text(description.replaceAll(exp, '') ?? "Whoops!"),
-                  SizedBox(height: 24),
-                  OutlineButton(
-                    onPressed: () => {_launchURL(link)},
-                    child: Text("Read More"),
-                  )
-                ],
+      backgroundColor: Colors.black,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            automaticallyImplyLeading: false,
+            expandedHeight: 150,
+            floating: true,
+            pinned: true,
+            snap: true,
+            flexibleSpace: FlexibleSpaceBar(
+              stretchModes: [
+                StretchMode.zoomBackground,
+                StretchMode.blurBackground,
+                StretchMode.fadeTitle,
+              ],
+              background: Image.network(
+                linkToImage,
+                fit: BoxFit.cover,
               ),
             ),
           ),
-        );
-      }),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: black,
-        foregroundColor: Colors.white,
-        child: Icon(Icons.home),
-        onPressed: () => Navigator.pop(context),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            fillOverscroll: true,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Center(
+                    child: Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                  child: Text(
+                    description,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 18,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ),
+                FlatButton(
+                  onPressed: () => {print("Pressed")},
+                  child: Text("Show Article"),
+                )
+              ],
+            ),
+          )
+        ],
       ),
     );
   }

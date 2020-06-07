@@ -1,3 +1,4 @@
+import 'package:Newsworthy/favourited.dart';
 import 'package:Newsworthy/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -22,7 +23,9 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         visualDensity: VisualDensity.comfortable,
       ),
-      home: MyHomePage(title: 'Newsworthy'),
+      home: Scaffold(
+        body: MyHomePage(title: 'Newsworthy'),
+      ),
     );
   }
 }
@@ -37,161 +40,124 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
   final date = new DateFormat('yyyy-MM-dd hh:mm');
   List<dynamic> _stories = [];
+  List<dynamic> _favorited = [];
 
-  void fetchNews() async {
+  Future<void> refreshStories() async {
     var result = await http.get(
         'http://newsapi.org/v2/top-headlines?country=AU&apiKey=8c264203168841c69e10fe9184079bbe');
     setState(() {
       _stories = json.decode(result.body)['articles'];
-      print(_stories);
+      _favorited = [];
     });
-  }
-
-  Future<void> _getData() async {
-    setState(() {
-      _stories = [];
-      fetchNews();
-    });
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  Widget _buildList() {
-    return _stories.length != 0
-        ? RefreshIndicator(
-            onRefresh: _getData,
-            child: GridView.builder(
-              primary: false,
-              padding: const EdgeInsets.all(20),
-              itemCount: _stories.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemBuilder: (BuildContext context, int index) {
-                print(new DateFormat.yMMMd().format(new DateTime.now()));
-                return Note(
-                  title: _stories[index]['title'],
-                  author: _stories[index]['author'],
-                  description: _stories[index]['description'],
-                  date: "May 21, 2020",
-                  backgroundColor: colors[next()],
-                  link: _stories[index]['url'],
-                );
-              },
-            ),
-          )
-        : Center(child: CircularProgressIndicator());
   }
 
   @override
   void initState() {
     super.initState();
-    fetchNews();
+    refreshStories();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          centerTitle: false,
-          title: InkWell(
-            onTap: () => {},
-            child: Row(
-              children: [
-                Icon(Icons.train),
-                SizedBox(
-                  width: 16,
-                ),
-                Text(
-                  widget.title,
-                  style: TextStyle(fontSize: 24),
+    return RefreshIndicator(
+      onRefresh: refreshStories,
+      child: Material(
+        color: Colors.black,
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              actions: [
+                IconButton(
+                  icon: Icon(_favorited.length > 0
+                      ? Icons.favorite
+                      : Icons.favorite_border),
+                  onPressed: () => {
+                    if (_favorited.length > 0)
+                      {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Favourited(
+                              favourites: _favorited,
+                            ),
+                          ),
+                        )
+                      }
+                    else
+                      {
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Hold a story title to save it for later!'),
+                            duration: Duration(seconds: 3),
+                          ),
+                        )
+                      }
+                  },
                 ),
               ],
-            ),
-          ),
-        ),
-        backgroundColor: black,
-        body: _buildList());
-  }
-}
-
-class Note extends StatelessWidget {
-  const Note({
-    Key key,
-    @required this.title,
-    @required this.description,
-    @required this.author,
-    @required this.date,
-    @required this.backgroundColor,
-    @required this.link,
-  }) : super(key: key);
-
-  final String title;
-  final String description;
-  final String author;
-  final String date;
-  final Color backgroundColor;
-  final String link;
-
-  @override
-  Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) => InkWell(
-        onLongPress: () {
-          Scaffold.of(context).showSnackBar(SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.favorite,
-                ),
-                SizedBox(
-                  width: 16,
-                ),
-                Text('Saved'),
-              ],
-            ),
-            duration: Duration(seconds: 3),
-          ));
-        },
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    Article(title, author, description, link)),
-          );
-        },
-        child: Ink(
-          padding: const EdgeInsets.all(20),
-          decoration: new BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.all(
-              Radius.circular(8),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+              expandedHeight: 150,
+              floating: false,
+              pinned: true,
+              snap: false,
+              flexibleSpace: FlexibleSpaceBar(
+                stretchModes: [
+                  StretchMode.zoomBackground,
+                  StretchMode.blurBackground,
+                  StretchMode.fadeTitle,
+                ],
+                title:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(Icons.train),
+                  SizedBox(width: 8),
+                  Text(
+                    "Newsworthy",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22.0,
+                    ),
+                  ),
+                ]),
+                background: Image.network(
+                  "https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+                  fit: BoxFit.cover,
                 ),
               ),
-            ],
-          ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => Card(
+                  color: Colors.black12,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ListTile(
+                      title: Text(_stories[index]['title']),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Article(
+                            _stories[index]['title'],
+                            _stories[index]['author'],
+                            _stories[index]['description'],
+                            _stories[index]['url'],
+                            _stories[index]['urlToImage'],
+                          ),
+                        ),
+                      ),
+                      onLongPress: () => {
+                        setState(() {
+                          _favorited.add(_stories[index]);
+                        })
+                      },
+                    ),
+                  ),
+                ),
+                childCount: _stories.length,
+              ),
+            ),
+          ],
         ),
       ),
     );
