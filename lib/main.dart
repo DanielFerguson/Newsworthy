@@ -44,9 +44,42 @@ class _MyHomePageState extends State<MyHomePage> {
   List<dynamic> _stories = [];
   List<dynamic> _favorited = [];
 
+  _navigateArticle(BuildContext context, index) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Article(
+          _stories[index]['title'],
+          _stories[index]['author'],
+          _stories[index]['description'],
+          _stories[index]['url'],
+          _stories[index]['urlToImage'],
+        ),
+      ),
+    );
+
+    print(result);
+  }
+
+  _navigateFavourites(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Favourited(
+          favourites: _favorited,
+        ),
+      ),
+    );
+
+    setState(() {
+      _favorited = result;
+    });
+  }
+
   Future<void> refreshStories() async {
     var result = await http.get(
         'http://newsapi.org/v2/top-headlines?country=AU&apiKey=8c264203168841c69e10fe9184079bbe');
+
     setState(() {
       _stories = json.decode(result.body)['articles'];
       _favorited = [];
@@ -74,27 +107,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       ? Icons.favorite
                       : Icons.favorite_border),
                   onPressed: () => {
-                    if (_favorited.length > 0)
-                      {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Favourited(
-                              favourites: _favorited,
+                    _favorited.length > 0
+                        ? _navigateFavourites(context)
+                        : Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Hold a story title to save it for later!'),
+                              duration: Duration(seconds: 2),
                             ),
-                          ),
-                        )
-                      }
-                    else
-                      {
-                        Scaffold.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Hold a story title to save it for later!'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        )
-                      }
+                          )
                   },
                 ),
               ],
@@ -135,23 +156,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     padding: const EdgeInsets.all(16.0),
                     child: ListTile(
                       title: Text(_stories[index]['title']),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Article(
-                            _stories[index]['title'],
-                            _stories[index]['author'],
-                            _stories[index]['description'],
-                            _stories[index]['url'],
-                            _stories[index]['urlToImage'],
-                          ),
-                        ),
-                      ),
-                      onLongPress: () => {
-                        setState(() {
-                          _favorited.add(_stories[index]);
-                        })
-                      },
+                      onTap: () => _navigateArticle(context, index),
+                      onLongPress: () => setState(() {
+                        _favorited.add(_stories[index]);
+                      }),
                     ),
                   ),
                 ),
