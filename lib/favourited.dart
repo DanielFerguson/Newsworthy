@@ -94,7 +94,11 @@ class _Favourited extends State<Favourited> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pop(context, widget.favourites),
-        child: Text("+"),
+        backgroundColor: Colors.white,
+        child: Icon(
+          Icons.arrow_back,
+          size: 24,
+        ),
       ),
     );
   }

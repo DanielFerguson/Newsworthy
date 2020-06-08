@@ -148,17 +148,51 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) => Card(
-                  color: Colors.black12,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ListTile(
-                      title: Text(_stories[index]['title']),
-                      onTap: () => _navigateArticle(context, index),
-                      onLongPress: () => setState(() {
-                        _favorited.add(_stories[index]);
-                      }),
+                (context, index) => Dismissible(
+                  key: Key(_stories[index]['title']),
+                  background: Container(
+                    color: Colors.blue,
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 32.0),
+                      child: Icon(
+                        Icons.favorite,
+                        size: 32,
+                      ),
                     ),
+                  ),
+                  secondaryBackground: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 32.0),
+                      child: Icon(
+                        Icons.remove_circle,
+                        size: 32,
+                      ),
+                    ),
+                  ),
+                  onDismissed: (direction) {
+                    if (direction == DismissDirection.startToEnd) {
+                      setState(() {
+                        _favorited.add(_stories[index]);
+                        _stories.removeAt(index);
+                      });
+                    } else {
+                      setState(() {
+                        _stories.removeAt(index);
+                      });
+                    }
+                  },
+                  child: ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(_stories[index]['title']),
+                    ),
+                    onTap: () => _navigateArticle(context, index),
+                    onLongPress: () => setState(() {
+                      _favorited.add(_stories[index]);
+                    }),
                   ),
                 ),
                 childCount: _stories.length,
