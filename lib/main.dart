@@ -1,5 +1,5 @@
 import 'package:Newsworthy/favourited.dart';
-import 'package:Newsworthy/utils/utils.dart';
+import 'package:Newsworthy/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -24,16 +24,14 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.comfortable,
       ),
       home: Scaffold(
-        body: MyHomePage(title: 'Newsworthy'),
+        body: Login(),
       ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  MyHomePage({Key key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
